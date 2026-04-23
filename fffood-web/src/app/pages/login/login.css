@@ -1,0 +1,32 @@
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .login-shell { grid-template-columns: 320px 1fr !important; }
+  .login-brand { padding: 32px 28px !important; }
+}
+
+/* Phone */
+@media (max-width: 767px) {
+  .login-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+  }
+  .login-brand {
+    padding: 32px 24px 24px !important;
+    flex-shrink: 0;
+  }
+  .login-brand h1 { font-size: 24px !important; }
+  .login-form-wrap {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    align-items: flex-start !important;
+  }
+  .login-form-wrap > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 24px 20px !important;
+  }
+}

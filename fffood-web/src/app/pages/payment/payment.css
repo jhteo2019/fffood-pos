@@ -1,0 +1,28 @@
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .pay-shell { grid-template-columns: 1fr 1.2fr !important; }
+}
+
+/* Phone */
+@media (max-width: 767px) {
+  .pay-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+  }
+  .pay-summary {
+    height: auto !important;
+    max-height: 38vh;
+    overflow-y: auto;
+    border-right: none !important;
+    border-bottom: 1px solid var(--rule);
+    flex-shrink: 0;
+  }
+  .pay-method {
+    height: auto !important;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 420px;
+  }
+}

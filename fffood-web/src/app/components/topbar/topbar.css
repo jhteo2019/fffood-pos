@@ -1,0 +1,17 @@
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .topbar { padding: 0 14px !important; }
+  .topbar-ok { display: none; }
+}
+
+/* Phone */
+@media (max-width: 767px) {
+  .topbar {
+    height: 48px !important;
+    padding: 0 14px !important;
+  }
+  .topbar-alerts { display: none !important; }
+  .topbar-user-text { display: none !important; }
+  .topbar-date { display: none !important; }
+  .topbar-terminal { display: none !important; }
+}

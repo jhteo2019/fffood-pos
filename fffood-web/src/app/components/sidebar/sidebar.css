@@ -1,0 +1,9 @@
+/* Tablet: slim sidebar — hide labels, reduce width */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .sidebar-nav {
+    width: 56px !important;
+  }
+  .sidebar-nav button span {
+    display: none;
+  }
+}

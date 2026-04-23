@@ -1,0 +1,43 @@
+.shell {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Tablet: 768–1023px — slimmer sidebar */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .shell {
+    grid-template-columns: 56px 1fr;
+  }
+}
+
+/* Phone: ≤767px — hide sidebar, use bottom nav */
+@media (max-width: 767px) {
+  .shell {
+    grid-template-columns: 1fr;
+    height: calc(100dvh - 64px);
+    height: calc(100vh - 64px);
+  }
+  .shell > app-sidebar {
+    display: none;
+  }
+  .content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

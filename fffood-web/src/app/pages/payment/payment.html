@@ -1,0 +1,185 @@
+<!-- ── SUCCESS SCREEN ── -->
+<div *ngIf="step === 'success'" class="animate-in"
+  style="height:100%; display:flex; align-items:center; justify-content:center; background:var(--paper);">
+  <div style="text-align:center; max-width:400px; padding:40px;">
+    <!-- Green check -->
+    <div style="width:80px; height:80px; border-radius:50%; background:rgba(122,140,92,0.15); border:3px solid var(--olive); display:flex; align-items:center; justify-content:center; margin:0 auto 28px;">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--olive)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h1 class="serif" style="font-size:32px; font-weight:400; color:var(--ink); margin-bottom:8px;">Paid in full</h1>
+    <p style="color:var(--ink-3); margin-bottom:28px; font-size:14px;">{{ orderMeta.number }} &nbsp;·&nbsp; {{ method | uppercase }}</p>
+
+    <div *ngIf="method === 'cash' && changeDue > 0"
+      style="background:rgba(212,165,116,0.15); border:1.5px solid rgba(212,165,116,0.4); border-radius:12px; padding:20px; margin-bottom:28px;">
+      <div style="font-size:12px; color:var(--ink-3); margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">Change Due</div>
+      <div class="tabular" style="font-size:36px; font-weight:700; color:var(--ink);">${{ changeDue.toFixed(2) }}</div>
+    </div>
+
+    <button (click)="onComplete()" class="btn btn-accent btn-lg" style="width:100%; font-size:16px; font-weight:700;">
+      New Order
+    </button>
+  </div>
+</div>
+
+<!-- ── TENDER SCREEN ── -->
+<div *ngIf="step === 'tender'" class="pay-shell" style="display:grid; grid-template-columns:1fr 1fr; height:100%; overflow:hidden; background:var(--paper);">
+
+  <!-- Left: Order Summary -->
+  <div class="pay-summary" style="display:flex; flex-direction:column; background:var(--card); border-right:1px solid var(--rule); height:100%; overflow:hidden;">
+
+    <!-- Header -->
+    <div style="padding:20px; border-bottom:1px solid var(--rule);">
+      <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px;">Order Summary</div>
+      <div class="tabular" style="font-size:20px; font-weight:700; color:var(--ink);">{{ orderMeta.number }}</div>
+      <div style="font-size:12px; color:var(--ink-3); margin-top:3px;">{{ orderMeta.date | date:'EEE d MMM' }} &nbsp;·&nbsp; {{ orderMeta.server }}</div>
+    </div>
+
+    <!-- Lines -->
+    <div class="scroll-soft" style="flex:1; overflow-y:auto; padding:12px 0;">
+      <div *ngFor="let line of lines" style="display:flex; gap:10px; padding:10px 20px; border-bottom:1px solid var(--paper-2);">
+        <span class="tabular" style="font-size:13px; font-weight:700; color:var(--ink-3); min-width:24px;">{{ line.qty }}×</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ line.itemName }}</div>
+          <div *ngIf="line.modifiers.length > 0" style="font-size:11px; color:var(--ink-3); margin-top:1px;">
+            {{ line.modifiers.slice(0,3).map(m2 => m2.name).join(', ') }}
+          </div>
+        </div>
+        <span class="tabular" style="font-size:13px; font-weight:700; color:var(--ink); flex-shrink:0;">${{ line.lineTotal.toFixed(2) }}</span>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div style="border-top:1px solid var(--rule); padding:16px 20px;">
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--ink-3);">
+          <span>Subtotal</span><span class="tabular">${{ subtotal.toFixed(2) }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--ink-3);">
+          <span>Tax (10%)</span><span class="tabular">${{ tax.toFixed(2) }}</span>
+        </div>
+        <div style="height:1px; background:var(--rule); margin:4px 0;"></div>
+        <div style="display:flex; justify-content:space-between; font-size:20px; font-weight:700; color:var(--ink);">
+          <span>Total</span><span class="tabular">${{ total.toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Toggles -->
+    <div style="border-top:1px solid var(--rule); padding:14px 20px; display:flex; gap:16px; flex-wrap:wrap;">
+      <label [class]="'toggle ' + (printReceipt ? 'on' : '')" (click)="printReceipt = !printReceipt">
+        <span class="track"></span> Print receipt
+      </label>
+      <label [class]="'toggle ' + (sendKitchen ? 'on' : '')" (click)="sendKitchen = !sendKitchen">
+        <span class="track"></span> Kitchen
+      </label>
+      <label [class]="'toggle ' + (emailReceipt ? 'on' : '')" (click)="emailReceipt = !emailReceipt">
+        <span class="track"></span> Email
+      </label>
+    </div>
+  </div>
+
+  <!-- Right: Payment Method -->
+  <div class="pay-method" style="display:flex; flex-direction:column; height:100%; overflow:hidden; background:var(--paper);">
+
+    <!-- Method Tabs -->
+    <div style="display:flex; gap:0; border-bottom:1px solid var(--rule); background:var(--card); flex-shrink:0;">
+      <button *ngFor="let m of methods"
+        (click)="setMethod(m)"
+        [style.borderBottom]="method === m ? '2px solid var(--terracotta)' : '2px solid transparent'"
+        [style.color]="method === m ? 'var(--terracotta)' : 'var(--ink-3)'"
+        [style.fontWeight]="method === m ? '700' : '400'"
+        style="flex:1; padding:14px 8px; background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; font-size:13px; text-transform:capitalize; transition:all 150ms;">
+        {{ m }}
+      </button>
+    </div>
+
+    <!-- CASH -->
+    <div *ngIf="method === 'cash'" class="animate-in" style="flex:1; display:flex; flex-direction:column; overflow:hidden; padding:20px;">
+      <!-- Display -->
+      <div style="background:var(--ink); border-radius:14px; padding:20px 24px; margin-bottom:16px;">
+        <div style="font-size:11px; letter-spacing:2px; color:rgba(255,255,255,0.45); margin-bottom:8px; text-transform:uppercase;">Tendered</div>
+        <div class="tabular" style="font-size:38px; font-weight:700; color:#fff; letter-spacing:-1px; min-height:48px;">
+          ${{ tendered || '0' }}
+        </div>
+        <div *ngIf="tenderedNum > 0" style="margin-top:8px; font-size:14px; color:rgba(255,255,255,0.5);">
+          Change: <span style="color:#9de0a3; font-weight:700;">${{ change.toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <!-- Quick Bills -->
+      <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+        <button *ngFor="let b of [5,10,20,50,100]"
+          (click)="setQuick(b)"
+          class="btn" style="flex:1; min-width:52px; font-weight:600;">${{ b }}</button>
+        <button (click)="exact()" class="btn btn-primary" style="flex:1; min-width:52px; font-size:11px; font-weight:600;">Exact</button>
+      </div>
+
+      <!-- Numpad -->
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; flex:1; align-content:start;">
+        <button *ngFor="let k of ['1','2','3','4','5','6','7','8','9','.',  '0']"
+          (click)="press(k)" class="key" style="width:100%; height:56px; font-size:18px;">{{ k }}</button>
+        <button (click)="backspace()" class="key" style="width:100%; height:56px; font-size:13px; color:var(--ink-3);">⌫</button>
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div *ngIf="method === 'card'" class="animate-in" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:24px;">
+      <div style="width:100%; max-width:320px; background:linear-gradient(135deg,var(--ink) 0%,#3a2e24 100%); border-radius:20px; padding:28px; color:#fff; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:-20px; right:-20px; width:120px; height:120px; border-radius:50%; background:rgba(196,85,60,0.2);"></div>
+        <div style="font-size:11px; letter-spacing:2px; opacity:0.5; margin-bottom:24px;">FFFood · CARD</div>
+        <div style="font-size:16px; letter-spacing:3px; font-family:var(--mono); margin-bottom:20px;">•••• •••• •••• ••••</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+          <div style="font-size:12px; opacity:0.5;">TOTAL</div>
+          <div class="tabular" style="font-size:28px; font-weight:700;">${{ total.toFixed(2) }}</div>
+        </div>
+      </div>
+      <div style="text-align:center; color:var(--ink-3); font-size:14px;">Present card to reader or enter card details</div>
+    </div>
+
+    <!-- QR -->
+    <div *ngIf="method === 'qr'" class="animate-in" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:24px;">
+      <div style="background:var(--card); border:1.5px solid var(--rule); border-radius:16px; padding:28px; display:inline-flex;">
+        <!-- Mock QR grid -->
+        <div style="display:grid; grid-template-columns:repeat(10,12px); grid-template-rows:repeat(10,12px); gap:2px;">
+          <div *ngFor="let i of [].constructor(100); let j = index"
+            [style.background]="(j%3===0||j%7===0||j<10||j>89) ? 'var(--ink)' : 'transparent'"
+            style="border-radius:2px;"></div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:14px; font-weight:600; color:var(--ink); margin-bottom:4px;">Scan to pay</div>
+        <div class="tabular" style="font-size:24px; font-weight:700; color:var(--terracotta);">${{ total.toFixed(2) }}</div>
+      </div>
+    </div>
+
+    <!-- SPLIT -->
+    <div *ngIf="method === 'split'" class="animate-in" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:24px;">
+      <div style="text-align:center;">
+        <div style="font-size:14px; color:var(--ink-3); margin-bottom:16px;">Split between</div>
+        <div style="display:flex; align-items:center; gap:16px; justify-content:center;">
+          <button (click)="splitWays = splitWays > 2 ? splitWays - 1 : 2" class="btn btn-ghost" style="width:40px; height:40px; padding:0; font-size:20px; border-radius:50%;">−</button>
+          <div class="tabular" style="font-size:48px; font-weight:700; color:var(--ink); min-width:64px; text-align:center;">{{ splitWays }}</div>
+          <button (click)="splitWays = splitWays + 1" class="btn btn-ghost" style="width:40px; height:40px; padding:0; font-size:20px; border-radius:50%;">+</button>
+        </div>
+        <div style="font-size:13px; color:var(--ink-3); margin-top:8px;">ways</div>
+      </div>
+      <div style="background:var(--card); border:1.5px solid var(--rule); border-radius:14px; padding:20px 32px; text-align:center;">
+        <div style="font-size:12px; color:var(--ink-3); margin-bottom:4px;">Per person</div>
+        <div class="tabular" style="font-size:32px; font-weight:700; color:var(--terracotta);">${{ (total / splitWays).toFixed(2) }}</div>
+      </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div style="border-top:1px solid var(--rule); padding:16px 20px; display:flex; gap:10px; flex-shrink:0; background:var(--card);">
+      <button routerLink="/pos" class="btn btn-ghost" style="flex:1;">
+        ← Back
+      </button>
+      <button (click)="finalize()" [disabled]="!canComplete || loading"
+        class="btn btn-accent btn-lg" style="flex:2; font-weight:700;">
+        <span *ngIf="!loading">Complete Payment</span>
+        <span *ngIf="loading">Processing…</span>
+      </button>
+    </div>
+  </div>
+
+</div>

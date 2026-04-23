@@ -1,0 +1,72 @@
+<nav class="sidebar-nav" style="width:72px; height:100vh; background:var(--ink); display:flex; flex-direction:column; align-items:center; padding:16px 0; gap:0; overflow:hidden; flex-shrink:0;">
+
+  <!-- Logo -->
+  <div style="font-size:28px; font-weight:700; color:#fff; font-family:Georgia,serif; letter-spacing:-1px; margin-bottom:28px; cursor:default; user-select:none;">ƒ</div>
+
+  <!-- Nav Items -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; width:100%;">
+
+    <!-- POS -->
+    <button (click)="navigate('pos')" title="Point of Sale"
+      style="position:relative; width:100%; height:56px; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; transition:background 150ms;"
+      [style.background]="activeScreen === 'pos' ? 'rgba(255,255,255,0.08)' : 'transparent'">
+      <!-- Active indicator -->
+      <div *ngIf="activeScreen === 'pos'" style="position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:28px; background:var(--mustard); border-radius:0 3px 3px 0;"></div>
+      <!-- Cart icon -->
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" [attr.stroke]="activeScreen === 'pos' ? '#fff' : 'rgba(255,255,255,0.45)'" stroke-width="2">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <span style="font-size:9px; font-weight:500; letter-spacing:0.5px; text-transform:uppercase;"
+        [style.color]="activeScreen === 'pos' ? '#fff' : 'rgba(255,255,255,0.35)'">POS</span>
+    </button>
+
+    <!-- Menu -->
+    <button (click)="navigate('menu')" title="Menu Management"
+      style="position:relative; width:100%; height:56px; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; transition:background 150ms;"
+      [style.background]="activeScreen === 'menu' ? 'rgba(255,255,255,0.08)' : 'transparent'">
+      <div *ngIf="activeScreen === 'menu'" style="position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:28px; background:var(--mustard); border-radius:0 3px 3px 0;"></div>
+      <!-- Book icon -->
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" [attr.stroke]="activeScreen === 'menu' ? '#fff' : 'rgba(255,255,255,0.45)'" stroke-width="2">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+      </svg>
+      <span style="font-size:9px; font-weight:500; letter-spacing:0.5px; text-transform:uppercase;"
+        [style.color]="activeScreen === 'menu' ? '#fff' : 'rgba(255,255,255,0.35)'">Menu</span>
+    </button>
+
+    <!-- Inventory -->
+    <button (click)="navigate('inventory')" title="Inventory"
+      style="position:relative; width:100%; height:56px; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; transition:background 150ms;"
+      [style.background]="activeScreen === 'inventory' ? 'rgba(255,255,255,0.08)' : 'transparent'">
+      <div *ngIf="activeScreen === 'inventory'" style="position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:28px; background:var(--mustard); border-radius:0 3px 3px 0;"></div>
+      <!-- Boxes icon -->
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" [attr.stroke]="activeScreen === 'inventory' ? '#fff' : 'rgba(255,255,255,0.45)'" stroke-width="2">
+        <path d="M2.97 12.92A2 2 0 002 14.63v3.24a2 2 0 001.17 1.82l4.82 2.49a2 2 0 001.94 0l4.82-2.49a2 2 0 001.17-1.82v-3.24a2 2 0 00-.97-1.71l-4.82-2.49a2 2 0 00-1.94 0z"/>
+        <path d="M10 22V16.97"/><path d="M7.26 21.03l-4.17-2.52"/>
+        <path d="M14 14.23l4.17-2.52a2 2 0 011.94 0l4.82 2.49a2 2 0 01.97 1.71v3.24a2 2 0 01-1.17 1.82l-4.82 2.49a2 2 0 01-1.94 0l-.82-.42"/>
+      </svg>
+      <span style="font-size:9px; font-weight:500; letter-spacing:0.5px; text-transform:uppercase;"
+        [style.color]="activeScreen === 'inventory' ? '#fff' : 'rgba(255,255,255,0.35)'">Stock</span>
+    </button>
+
+  </div>
+
+  <!-- Bottom: settings + user -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:10px; padding-bottom:4px;">
+    <!-- Settings -->
+    <button title="Settings"
+      style="width:40px; height:40px; border-radius:10px; background:rgba(255,255,255,0.06); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+      </svg>
+    </button>
+
+    <!-- User Avatar -->
+    <button (click)="onLogout()" title="Logout {{ user?.name }}"
+      [style.background]="user?.color || 'var(--terracotta)'"
+      style="width:40px; height:40px; border-radius:50%; border:2px solid rgba(255,255,255,0.2); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; letter-spacing:-0.5px; user-select:none;">
+      {{ user?.initials ?? '?' }}
+    </button>
+  </div>
+
+</nav>

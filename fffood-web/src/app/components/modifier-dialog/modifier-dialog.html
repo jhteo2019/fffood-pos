@@ -1,0 +1,69 @@
+<div *ngIf="item" class="animate-slide"
+  style="background:var(--card); border-radius:20px; width:480px; max-width:95vw; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(26,24,20,0.35);">
+
+  <!-- Header -->
+  <div style="padding:20px 20px 16px; border-bottom:1px solid var(--rule); display:flex; gap:14px; align-items:flex-start; flex-shrink:0;">
+    <!-- Art -->
+    <div style="width:52px; height:52px; border-radius:14px; background:var(--terracotta); opacity:0.8; flex-shrink:0;"></div>
+    <div style="flex:1; min-width:0;">
+      <div style="font-size:17px; font-weight:700; color:var(--ink); margin-bottom:3px;">{{ item.name }}</div>
+      <div class="tabular" style="font-size:14px; color:var(--ink-3);">Base: ${{ item.price.toFixed(2) }}</div>
+    </div>
+    <button (click)="onClose()" style="background:none; border:none; cursor:pointer; color:var(--ink-3); font-size:20px; line-height:1; padding:2px; flex-shrink:0;">✕</button>
+  </div>
+
+  <!-- Modifier Groups -->
+  <div class="scroll-soft" style="flex:1; overflow-y:auto; padding:16px 20px;">
+
+    <div *ngFor="let group of item.modifiers" style="margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <div style="font-size:13px; font-weight:700; color:var(--ink);">{{ group.name }}</div>
+        <span *ngIf="group.isRequired" class="chip chip-terra" style="font-size:10px; padding:1px 7px;">Required</span>
+        <span *ngIf="!group.isRequired" class="chip" style="font-size:10px; padding:1px 7px;">Optional</span>
+        <span *ngIf="group.isMulti" class="chip chip-olive" style="font-size:10px; padding:1px 7px;">Pick many</span>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button *ngFor="let opt of group.options"
+          (click)="toggle(group.id, opt.id, group.isMulti)"
+          [style.background]="isSelected(group.id, opt.id) ? 'var(--ink)' : 'var(--paper)'"
+          [style.borderColor]="isSelected(group.id, opt.id) ? 'var(--ink)' : 'var(--rule)'"
+          [style.color]="isSelected(group.id, opt.id) ? '#fff' : 'var(--ink-2)'"
+          style="padding:8px 14px; border-radius:8px; border:1.5px solid var(--rule); background:var(--paper); cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; transition:all 150ms;">
+          <span>{{ opt.name }}</span>
+          <span *ngIf="opt.price > 0" style="font-size:11px; opacity:0.7; font-family:var(--mono);">+${{ opt.price.toFixed(2) }}</span>
+          <span *ngIf="opt.price < 0" style="font-size:11px; opacity:0.7; font-family:var(--mono);">${{ opt.price.toFixed(2) }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Kitchen Note -->
+    <div style="margin-top:4px;">
+      <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:8px;">Kitchen note</div>
+      <textarea [(ngModel)]="note" class="input" rows="2"
+        placeholder="Allergies, preferences, special prep…"
+        style="resize:none; line-height:1.5;"></textarea>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding:16px 20px; border-top:1px solid var(--rule); display:flex; align-items:center; gap:12px; flex-shrink:0;">
+
+    <!-- Qty -->
+    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+      <button (click)="changeQty(-1)" class="btn btn-ghost" style="width:36px; height:36px; padding:0; font-size:20px; border-radius:50%;">−</button>
+      <span class="tabular" style="font-size:18px; font-weight:700; color:var(--ink); min-width:28px; text-align:center;">{{ qty }}</span>
+      <button (click)="changeQty(1)"  class="btn btn-ghost" style="width:36px; height:36px; padding:0; font-size:20px; border-radius:50%;">+</button>
+    </div>
+
+    <!-- Spacer -->
+    <div style="flex:1;"></div>
+
+    <!-- Add Button -->
+    <button (click)="onConfirm()" [disabled]="!canConfirm"
+      class="btn btn-accent btn-lg" style="font-weight:700; min-width:160px;">
+      Add to order · ${{ lineTotal.toFixed(2) }}
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,221 @@
+<div class="menu-shell" style="display:flex; height:100%; overflow:hidden; background:var(--paper);">
+
+  <!-- ── Sidebar: Category List ── -->
+  <div class="menu-cat-sidebar" style="width:220px; flex-shrink:0; background:var(--card); border-right:1px solid var(--rule); display:flex; flex-direction:column; overflow:hidden;">
+    <div style="padding:20px 16px 14px; border-bottom:1px solid var(--rule);">
+      <h2 class="serif" style="font-size:20px; font-weight:400; color:var(--ink);">Menu</h2>
+      <div style="font-size:11px; color:var(--ink-3); margin-top:2px;">{{ items.length }} items total</div>
+    </div>
+
+    <nav class="scroll-soft" style="flex:1; overflow-y:auto; padding:8px;">
+      <button (click)="setCatFilter('all')"
+        [style.background]="catFilter === 'all' ? 'var(--paper-2)' : 'transparent'"
+        [style.color]="catFilter === 'all' ? 'var(--ink)' : 'var(--ink-3)'"
+        [style.fontWeight]="catFilter === 'all' ? '600' : '400'"
+        style="width:100%; text-align:left; padding:10px 12px; border:none; border-radius:8px; cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:space-between; transition:all 150ms;">
+        <span>All items</span>
+        <span style="font-size:11px;">{{ items.length }}</span>
+      </button>
+
+      <button *ngFor="let cat of categories"
+        (click)="setCatFilter(cat.id)"
+        [style.background]="catFilter === cat.id ? 'var(--paper-2)' : 'transparent'"
+        [style.color]="catFilter === cat.id ? 'var(--ink)' : 'var(--ink-3)'"
+        [style.fontWeight]="catFilter === cat.id ? '600' : '400'"
+        style="width:100%; text-align:left; padding:10px 12px; border:none; border-radius:8px; cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:space-between; transition:all 150ms; margin-top:2px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div [style.background]="getCategoryColor(cat.id)" style="width:8px; height:8px; border-radius:50%; flex-shrink:0;"></div>
+          <span>{{ cat.name }}</span>
+        </div>
+        <span style="font-size:11px;">{{ items.filter(i => i.categoryId === cat.id).length }}</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ── Main: Item List ── -->
+  <div class="menu-item-main" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+
+    <!-- Header -->
+    <div style="padding:20px 24px 14px; border-bottom:1px solid var(--rule); background:var(--card); flex-shrink:0;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <h1 class="serif" style="font-size:24px; font-weight:400; color:var(--ink);">
+            {{ catFilter === 'all' ? 'All Items' : getCategoryName(catFilter) }}
+          </h1>
+          <div style="font-size:12px; color:var(--ink-3); margin-top:2px;">{{ filtered.length }} items</div>
+        </div>
+        <button (click)="openAddForm()" class="btn btn-primary" style="font-size:13px;">+ Add Item</button>
+      </div>
+      <!-- Mobile category picker (hidden on desktop via CSS) -->
+      <div class="menu-cat-mobile" style="margin-top:10px;">
+        <select [(ngModel)]="catFilter" (change)="filterItems()" class="input" style="font-size:13px;">
+          <option value="all">All items</option>
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Item List -->
+    <div class="scroll-soft" style="flex:1; overflow-y:auto; padding:16px 24px;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+
+        <!-- Empty -->
+        <div *ngIf="filtered.length === 0" style="text-align:center; padding:60px 20px; color:var(--ink-3);">
+          <div style="font-size:24px; margin-bottom:10px;">🍽️</div>
+          <div style="font-size:14px;">No items in this category</div>
+        </div>
+
+        <!-- Item Row / Edit -->
+        <div *ngFor="let item of filtered">
+
+          <!-- View Mode -->
+          <div *ngIf="editingId !== item.id"
+            style="background:var(--card); border:1.5px solid var(--rule); border-radius:12px; padding:14px 18px; display:flex; align-items:center; gap:14px; transition:border-color 150ms;"
+            [style.opacity]="item.isActive ? '1' : '0.6'">
+
+            <!-- Art -->
+            <div [style.background]="getCategoryColor(item.categoryId)"
+              style="width:40px; height:40px; border-radius:10px; flex-shrink:0; opacity:0.8;"></div>
+
+            <!-- Info -->
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="font-size:14px; font-weight:600; color:var(--ink);">{{ item.name }}</span>
+                <span *ngIf="!item.isActive" class="chip chip-warn" style="font-size:10px;">Hidden</span>
+                <span *ngFor="let tag of item.tags.slice(0,2)" class="chip" style="font-size:10px; padding:1px 7px;">{{ tag }}</span>
+              </div>
+              <div style="font-size:12px; color:var(--ink-3);">
+                <span>{{ getCategoryName(item.categoryId) }}</span>
+                <span style="margin:0 8px; color:var(--rule);">·</span>
+                <span *ngIf="item.modifiers && item.modifiers.length > 0">{{ item.modifiers.length }} modifier group{{ item.modifiers.length !== 1 ? 's' : '' }}</span>
+                <span *ngIf="!item.modifiers || item.modifiers.length === 0">No modifiers</span>
+                <span style="margin:0 8px; color:var(--rule);">·</span>
+                <span>{{ item.stock }} in stock</span>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="tabular" style="font-size:16px; font-weight:700; color:var(--terracotta); flex-shrink:0; margin-right:8px;">
+              ${{ item.price.toFixed(2) }}
+            </div>
+
+            <!-- Controls -->
+            <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+              <!-- Available toggle -->
+              <label [class]="'toggle ' + (item.isActive ? 'on' : '')" (click)="toggleAvailable(item.id)" style="cursor:pointer;">
+                <span class="track"></span>
+              </label>
+              <button (click)="startEdit(item)" class="btn" style="font-size:12px; padding:6px 12px;">Edit</button>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div *ngIf="editingId === item.id" class="animate-slide"
+            style="background:var(--card); border:2px solid var(--mustard); border-radius:12px; padding:18px;">
+            <div style="font-size:12px; font-weight:600; color:var(--ink-3); margin-bottom:14px; text-transform:uppercase; letter-spacing:1px;">Editing item</div>
+
+            <div style="display:grid; grid-template-columns:1fr auto auto; gap:10px; margin-bottom:12px; align-items:start;">
+              <!-- Name -->
+              <div>
+                <div style="font-size:11px; color:var(--ink-3); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Name</div>
+                <input [(ngModel)]="editState.name" class="input" style="font-weight:600;"/>
+              </div>
+              <!-- Price -->
+              <div>
+                <div style="font-size:11px; color:var(--ink-3); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Price</div>
+                <input [(ngModel)]="editState.price" type="number" min="0" step="0.01" class="input" style="width:100px;"/>
+              </div>
+              <!-- Available -->
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding-top:4px;">
+                <div style="font-size:11px; color:var(--ink-3); text-transform:uppercase; letter-spacing:0.5px;">Active</div>
+                <label [class]="'toggle ' + (editState.isActive ? 'on' : '')" (click)="editState.isActive = !editState.isActive" style="cursor:pointer; margin-top:4px;">
+                  <span class="track"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11px; color:var(--ink-3); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Tags (comma separated)</div>
+              <input [(ngModel)]="editState.tags" class="input" placeholder="e.g. vegan, spicy, gluten-free"/>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <button (click)="cancelEdit()" class="btn btn-ghost">Cancel</button>
+              <button (click)="updateItem(item.id)" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Item Modal ── -->
+<div *ngIf="showAddForm"
+  style="position:fixed; inset:0; background:rgba(26,24,20,0.55); z-index:200; display:flex; align-items:center; justify-content:center; padding:24px;"
+  (click)="cancelAdd()">
+  <div class="animate-slide"
+    style="background:var(--card); border-radius:16px; width:100%; max-width:480px; box-shadow:0 20px 60px rgba(26,24,20,0.3); overflow:hidden;"
+    (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div style="padding:20px 24px 16px; border-bottom:1px solid var(--rule); display:flex; align-items:center; justify-content:space-between;">
+      <h2 style="font-size:18px; font-weight:700; color:var(--ink);">New Menu Item</h2>
+      <button (click)="cancelAdd()" style="background:none; border:none; cursor:pointer; color:var(--ink-3); font-size:20px; line-height:1;">✕</button>
+    </div>
+
+    <!-- Form -->
+    <div style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
+
+      <!-- Name -->
+      <div>
+        <div style="font-size:11px; color:var(--ink-3); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">Item Name *</div>
+        <input [(ngModel)]="addState.name" class="input" placeholder="e.g. Grilled Salmon"/>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <div style="font-size:11px; color:var(--ink-3); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">Category *</div>
+        <select [(ngModel)]="addState.categoryId" class="input" style="cursor:pointer;">
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+
+      <!-- Price + Stock -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <div style="font-size:11px; color:var(--ink-3); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">Price ($) *</div>
+          <input [(ngModel)]="addState.price" type="number" min="0" step="0.01" class="input" placeholder="0.00"/>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--ink-3); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">Opening Stock</div>
+          <input [(ngModel)]="addState.stock" type="number" min="0" class="input" placeholder="0"/>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div>
+        <div style="font-size:11px; color:var(--ink-3); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;">Tags (comma separated)</div>
+        <input [(ngModel)]="addState.tags" class="input" placeholder="e.g. vegan, spicy, popular"/>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="addError" style="margin:0 24px 12px; padding:10px 14px; background:rgba(229,90,58,0.1); border:1.5px solid rgba(229,90,58,0.35); border-radius:8px; font-size:13px; color:#c0392b;">
+      {{ addError }}
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:16px 24px; border-top:1px solid var(--rule); display:flex; gap:10px; justify-content:flex-end;">
+      <button (click)="cancelAdd()" class="btn btn-ghost">Cancel</button>
+      <button (click)="saveNewItem()" [disabled]="!addState.name.trim() || +addState.price <= 0 || addSaving"
+        class="btn btn-primary" style="min-width:120px;">
+        {{ addSaving ? 'Saving…' : 'Add Item' }}
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,16 @@
+/* Mobile category dropdown hidden on desktop/tablet */
+.menu-cat-mobile { display: none; }
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .menu-cat-sidebar { width: 180px !important; }
+}
+
+/* Phone */
+@media (max-width: 767px) {
+  .menu-cat-sidebar { display: none !important; }
+  .menu-cat-mobile { display: block !important; }
+  .menu-item-main > .scroll-soft {
+    padding: 12px 14px 80px !important;
+  }
+}
